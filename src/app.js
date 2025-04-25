@@ -6,6 +6,7 @@ import requestIp from "request-ip";
 import rateLimit from "express-rate-limit";
 import { ApiError } from "./utils/ApiError.js";
 import { errorHandler } from "./middleware/error.middleware.js";
+import userRoutes from "./routes/user.routes.js"
 
 
 dotenv.config();
@@ -40,6 +41,8 @@ app.use(cors({
 }));
 
 app.use(cookieParser);
+
+app.use("/api/v1/users", userRoutes)
 
 app.use(errorHandler);
 
