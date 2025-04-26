@@ -3,6 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import requestIp from "request-ip";
+import passport from "passport";
+import session from "express-session";
 import rateLimit from "express-rate-limit";
 import { ApiError } from "./utils/ApiError.js";
 import { errorHandler } from "./middleware/error.middleware.js";
@@ -41,6 +43,18 @@ app.use(cors({
 }));
 
 app.use(cookieParser);
+// required for passport
+app.use(
+    session({
+        secret: process.env.EXPRESS_SESSION_SECRET,
+        resave: true,
+        saveUninitialized: true,
+    })
+);
+// session secret
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use("/api/v1/users", userRoutes)
 

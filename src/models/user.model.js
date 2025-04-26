@@ -1,28 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { AvailableUserRoles, UserRolesEnum } from "../constants.js"
-
-const apiKeySchema = new mongoose.Schema({
-    key: { type: String, required: true },
-    name: { type: String, required: true },
-    permissions: [{ type: String }],
-    createdAt: { type: Date, default: Date.now },
-    lastUsed: { type: Date }
-});
-
-const editorSettingsSchema = new mongoose.Schema({
-    theme: { type: String, default: 'light' },
-    fontSize: { type: Number, default: 14 },
-    tabSize: { type: Number, default: 2 },
-    lineWrap: { type: Boolean, default: true },
-    keyBindings: { type: String, default: 'standard' }
-});
-
-const notificationSettingsSchema = new mongoose.Schema({
-    email: { type: Boolean, default: true },
-    inApp: { type: Boolean, default: true }
-});
+import crypto from "crypto";
+import { AvailableSocialLogins, AvailableUserRoles, USER_TEMPORARY_TOKEN_EXPIRY, UserLoginType, UserRolesEnum } from "../constants.js";
 
 const userSchema = new Schema({
     username: {
@@ -50,23 +30,38 @@ const userSchema = new Schema({
         required: [true, "Password is required"],
         select: false,
     },
+    loginType: {
+        type: String,
+        enum: AvailableSocialLogins,
+        default: UserLoginType.EMAIL_PASSWORD,
+    },
     isEmailVerified: {
         type: Boolean,
         default: false,
     },
-    lastActive: { 
-        type: Date, 
-        default: Date.now 
-      },
     refreshToken: {
         type: String,
 
     },
-    settings: {
-        editor: editorSettingsSchema,
-        notifications: notificationSettingsSchema
+    forgotPasswordToken: {
+        type: String,
+    }, 
+    forgotPasswordExpiry: {
+        type: Date,
     },
-    apiKeys: [apiKeySchema]
+    emailVerificationToken: {
+        type: String,
+    },
+    emailVerificationExpiry: {
+        type: Date,
+    },
+    apiKeys: [{
+        key: String,
+        name: String,
+        createdAt: { type: Date, default: Date.now },
+        lastUsed: Date,
+        permissions: [String]
+      }]
 }, {
     timestamps: true,
 })
@@ -81,10 +76,6 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
-userSchema.methods.updateActivity = function() {
-    this.lastActive = new Date();
-    return this.save();
-  };
 
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign({
@@ -108,24 +99,7 @@ userSchema.methods.generateRefreshToken = function () {
             expiresIn: process.env.REFRESH_TOKEN_EXPIRY
         }
     )
-};
-
-userSchema.methods.createApiKey = async function(name, permissions = []) {
-    const apiKeyValue = crypto.randomBytes(32).toString('hex');
-    
-    const hashedKey = await bcrypt.hash(apiKeyValue, 10);
-    
-    this.apiKeys.push({
-      key: hashedKey,
-      name,
-      permissions,
-      createdAt: new Date(),
-      lastUsed: null
-    });
-    
-    await this.save();
-    return apiKeyValue; 
-  };
+}
 
 userSchema.methods.generateTemporaryToken = function () {
     const unHashedToken = crypto.randomBytes(20).toString("hex");
@@ -142,5 +116,16 @@ userSchema.methods.generateTemporaryToken = function () {
         tokenExpiry,
     };
 };
+
+userSchema.methods.generateApiKey = function(name, permissions = ['read']) {
+    const key = `ak_${crypto.randomBytes(24).toString('hex')}`;
+    this.apiKeys.push({
+      key,
+      name,
+      createdAt: Date.now(),
+      permissions
+    });
+    return key;
+  };
 
 export const User = mongoose.model("User", userSchema);

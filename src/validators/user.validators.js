@@ -1,6 +1,7 @@
-import { body } from "express-validator"
+import { body, param } from 'express-validator';
+import { AvailableUserRoles } from '../constants.js';
 
-export const registerValidator = [
+export const userRegisterValidator = [
     body("email")
         .trim()
         .notEmpty()
@@ -22,7 +23,7 @@ export const registerValidator = [
    
 ]
 
-export const loginValidator = [
+export const userLoginValidator = [
 
     body("email")
         .optional()
@@ -40,7 +41,7 @@ export const loginValidator = [
 
 ]
 
-export const changeCurrentPasswordValidator = [
+export const userChangeCurrentPasswordValidator = [
     body("oldPassword")
         .notEmpty()
         .withMessage("Old password is required")
@@ -52,3 +53,29 @@ export const changeCurrentPasswordValidator = [
         .isLength({ min: 6 })
         .withMessage("New password should be at least 6 characters long"),
 ];
+
+export const userForgotPasswordValidator = [
+    body("email")
+        .notEmpty()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Email is invalid"),
+];
+
+export const userResetForgottenPasswordValidator = [
+    body("newPassword")
+        .notEmpty()
+        .withMessage("New password is required")
+        .isLength({ min: 6 })
+        .withMessage("New password should be at least 6 characters long"),
+];
+
+export const apiKeyValidation = [
+    body('name')
+      .notEmpty().withMessage('API key name is required')
+      .trim(),
+    body('permissions')
+      .optional()
+      .isArray().withMessage('Permissions must be an array'),
+  ];
+  
