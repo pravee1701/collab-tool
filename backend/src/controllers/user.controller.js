@@ -31,8 +31,7 @@ export const generateAccessAndRefreshToken = async (userId) => {
 };
 
 export const registerUser = asyncHandler(async (req, res) => {
-    const { username, email, password, role } = req.body;
-
+    const { username, email, password } = req.body;
     const existedUser = await User.findOne({
         $or: [
             { email },
@@ -49,7 +48,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         password,
         username,
         isEmailVerified: false,
-        role: role || UserRolesEnum.USER,
+        role: UserRolesEnum.USER,
     });
 
     const { unHashedToken, hashedToken, tokenExpiry } = user.generateTemporaryToken();
@@ -175,13 +174,13 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
         };
         const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshToken(user._id);
 
-        user.refreshToken = refreshToken;
+        user.refreshToken = newRefreshToken;
         await user.save();
 
         return res
             .status(200)
             .cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", refreshToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
             .json(
                 new ApiResponse(
                     200,

@@ -9,7 +9,11 @@ dotenv.config();
 const server = http.createServer(app);
 
 connectDB();
-const Port = process.env.PORT || 8080;
-server.listen(Port, () => {
-    logger.info(`Server is running on Port: ${Port}`)
+
+
+const PORT = process.env.PORT || 8080;
+
+
+server.listen(PORT, () => {
+    logger.info(`Server is running on port ${PORT}`);
 })

@@ -1,4 +1,4 @@
-export const DB_NAME=""
+export const DB_NAME="collab-tool"
 
 export const UserRolesEnum = {
     USER: "USER",

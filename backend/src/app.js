@@ -42,7 +42,7 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(cookieParser);
+app.use(cookieParser());
 // required for passport
 app.use(
     session({
@@ -56,7 +56,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/api/v1/users", userRoutes)
+app.use("/api/v1/user", userRoutes);
 
 app.use(errorHandler);
 

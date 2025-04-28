@@ -31,7 +31,7 @@ export const protect = asyncHandler(async (req, res, next) => {
         "Invalid access token"
       );
     }
-    if (!user.isVerified && req.path !== '/api/auth/verify') {
+    if (!user.isEmailVerified && req.path !== '/verify-email') {
       return next(new ApiError(401, 'Please verify your email first'));
     }
 
