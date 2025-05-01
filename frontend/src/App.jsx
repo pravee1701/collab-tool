@@ -14,6 +14,15 @@ import SocialAuthCallback from "./pages/auth/SocialAuthCallback";
 import ResendEmailVerification from "./pages/auth/ResendEmailVerification";
 import Profile from "./pages/profile/Profile";
 import ChangePassword from "./pages/ChangePassword";
+import ProjectList from "./pages/ProjectList";
+import ProjectCreate from "./pages/ProjectCreate";
+import ProjectDetails from "./pages/ProjectDetailsPage";
+import ProjectSettings from "./components/ProjectSettings";
+import ProjectFork from "./pages/ProjectFork";
+import FileExplorerPage from "./components/FileExplorer";  
+import FileEditorPage from "./pages/FileEditorPage";      
+import FileVersioningPage from "./pages/FileVersioningPage"; 
+import ProjectEditorPage from "./pages/ProjectEditorPage";
 
 function App() {
   return (
@@ -38,6 +47,19 @@ function App() {
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/settings/change-password" element={<ChangePassword />} />
             <Route path="/profile" element={<Profile />} />
+            
+            {/* Project Routes */}
+            <Route path="/projects" element={<ProjectList />} />
+            <Route path="/projects/create" element={<ProjectCreate />} />
+            <Route path="/projects/:id" element={<ProjectDetails />} />
+            <Route path="/projects/:id/settings" element={<ProjectSettings />} />
+            <Route path="/projects/:id/fork" element={<ProjectFork />} />
+            
+            {/* File Management Routes */}
+            <Route path="/projects/:id/files" element={<FileExplorerPage />} />  
+            <Route path="/projects/:id/editor" element={<ProjectEditorPage />} /> {/* File Explorer */}
+            <Route path="/projects/:id/files/:fileId" element={<FileEditorPage />} /> {/* File Editor */}
+            <Route path="/projects/:id/files/:fileId/versions" element={<FileVersioningPage />} /> {/* File Versioning */}
           </Route>
         </Routes>
 
