@@ -8,7 +8,9 @@ import session from "express-session";
 import rateLimit from "express-rate-limit";
 import { ApiError } from "./utils/ApiError.js";
 import { errorHandler } from "./middleware/error.middleware.js";
-import userRoutes from "./routes/user.routes.js"
+import userRoutes from "./routes/user.routes.js";
+import projectRoutes from "./routes/project.routes.js";
+import fileRoutes from "./routes/file.routes.js";
 
 
 dotenv.config();
@@ -30,7 +32,7 @@ const createLimiter = rateLimit({
     }
 })
 
-app.use(createLimiter);
+// app.use(createLimiter);
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true,
@@ -57,6 +59,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/projects", projectRoutes);
+app.use("/api/v1", fileRoutes);
 
 app.use(errorHandler);
 
